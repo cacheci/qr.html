@@ -1428,6 +1428,7 @@
           readingerror = "Error reading the file: ";
           font_error = "font-family: Arial";
           document.title = "QR Generator";
+          toosmalldisplay = "Screen too small!";
         } else if (partlang == "zh") {
           weblang = "zh";
           TipStart = "提示：";
@@ -1447,6 +1448,7 @@
             '您可以通过在输入框中输入任何文本来生成二维码。<br>代码本地执行，不会上传任何信息。<br>您可以下载此文件（右上角的按钮）以离线使用。<br>如果布局有问题，请尝试调整浏览器窗口的大小。<br><br>⚠️ 二维码的最大大小为 2950 字节（约一段含有 900 汉字的文章）<br>⚠️ 某些浏览器中会出现功能异常。如果遇到问题请使用 Chrome。<br>🎉 现在应该也适用于表情符号<br>📁 您现在可以将文件拖放到此文本框中<br>📁 您可以将文件复制粘贴到此文本区域<br><br>您也可以尝试某些高级二维码的生成，比如：<br>使用类似下一行格式的文本生成连接 Wi-Fi 的二维码：<br><b class="CourierNew">WIFI:T:WPA;S:我是网络名称;P:我是密码;;</b><br>或者让别人快速地给你发一封邮件？试试：<br>\'<b class="CourierNew">mailto:user@example.com</b>\'<br>让别人打电话或发短信给你？<br>\'<b class="CourierNew">tel:+8617700000000</b>\' <br> \'<b class="CourierNew">smsto:+8615300000000:经验+3，告辞！</b>\' <br>或者想骗你的朋友？试试这个：<br>\'<b class="CourierNew">https://go.microsoft.com/fwlink/?LinkId=872991</b>\'<br><br>本生成器修改自：<a class="linktip" href="https://github.com/six-two/qr.html">https://github.com/six-two/qr.html</a><br>QR生成代码来自：<a class="linktip" href="https://github.com/nimiq/qr-creator">https://github.com/nimiq/qr-creator</a><br>项目地址：<a class="linktip" href="https://github.com/cacheci/qr.html">https://github.com/cacheci/qr.html</a>';
           font_error = 'font-family: "FangSong", Courier, "PingFang SC"';
           document.title = "二维码生成器";
+          toosmalldisplay = "窗口过小！";
         } else langupdate("en");
         console.log(`lang changed to ${partlang}`);
         showQrCodeGenerationError(infoweb);
@@ -1468,15 +1470,25 @@
         weblang = langc;
       }
 
+      var screenmode = 2;
+      var toosmall = 0;
+
       function handleWindowResize() {
-        if (document.body.clientWidth / document.body.clientHeight >= 1) {
-          console.log("Big Screen Mode");
+        if (document.body.clientWidth / document.body.clientHeight >= 0.94) {
+          if (screenmode != 0) {
+            console.log("Big Screen Mode");
+            screenmode = 0;
+          }
+
           document.getElementById("qrcode").style.paddingLeft = "5px";
           document.getElementById("qrcode").style.paddingRight = "5px";
           document.getElementById("qrcode").style.paddingTop = "0px";
           document.getElementById("qrcode").style.paddingBottom = "0px";
         } else {
-          console.log("Mobile Mode.");
+          if (screenmode != 1) {
+            console.log("Mobile Mode.");
+            screenmode = 1;
+          }
           document.getElementById("qrcode").style.paddingLeft = "0px";
           document.getElementById("qrcode").style.paddingRight = "2px";
           document.getElementById("qrcode").style.paddingTop = "0px";
@@ -1484,9 +1496,20 @@
           document.getElementById("qrcode").style.marginTop = "5px";
           document.getElementById("input").style.paddingRight = "15px";
         }
+        if (document.body.clientWidth <= 320) {
+          document.getElementsByClassName("button")[0].style.display = "none";
+          if (document.body.clientWidth <= 220 && toosmall != 1) {
+            window.alert(toosmalldisplay);
+            toosmall = 1;
+          }
+        } else {
+          document.getElementsByClassName("button")[0].style.display =
+            "inline-block";
+        }
       }
 
       handleWindowResize();
+
       window.addEventListener("resize", handleWindowResize);
     </script>
   </body>
