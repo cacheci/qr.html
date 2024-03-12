@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="zh">
-  <script src="jquery-3.3.1.min.js"></script>
   <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -10,7 +9,7 @@
       http-equiv="Content-Security-Policy"
       content="default-src 'self' 'unsafe-inline' data:;"
     />
-    <title>二维码生成器</title>
+    <title idl="WEBtitle">二维码生成器</title>
     <link
       rel="icon"
       type="image/x-icon"
@@ -68,6 +67,8 @@
           --inputbg: rgb(33, 33, 36);
           --button: #bdb4b918;
           --tipslink: #9583ff;
+          --scrollbg: rgb(87, 87, 87);
+          --scrollbgo: #363636;
         }
       }
 
@@ -82,6 +83,8 @@
           --inputbg: rgb(252, 249, 253);
           --button: #ff788a36;
           --tipslink: #f72081;
+          --scrollbg: #ffbfbf;
+          --scrollbgo: #fecdcd87;
         }
       }
 
@@ -95,6 +98,8 @@
         --inputbg: rgb(252, 249, 253);
         --button: #ff788a36;
         --tipslink: #f72081;
+        --scrollbg: #ffbfbf;
+        --scrollbgo: #fecdcd87;
       }
 
       :root[data-theme="dark"] {
@@ -108,6 +113,8 @@
         --inputbg: rgb(33, 33, 36);
         --button: #bdb4b918;
         --tipslink: #9583ff;
+        --scrollbg: rgb(87, 87, 87);
+        --scrollbgo: #363636;
       }
 
       body {
@@ -125,6 +132,7 @@
       header {
         width: 100%;
         height: 52px;
+        min-height: 52px;
         background-color: var(--headerbg);
         color: var(--headertext);
         display: flex;
@@ -164,11 +172,11 @@
         flex: 1;
         display: flex;
         flex-direction: column;
-        padding: 5px;
+        padding: 10px;
       }
 
       .CourierNew {
-        font-family: "Courier New", monospace, "PingFang SC", "Microsoft Yahei";
+        font-family: "Courier New", monospace, "PingFang SC", "SimHei";
       }
 
       #input-div {
@@ -177,6 +185,8 @@
         flex: 1;
         display: flex;
         flex-direction: column;
+        overflow-y: auto;
+        border-radius: 6px;
       }
 
       #input {
@@ -186,6 +196,8 @@
         resize: none;
         background-color: var(--inputbg);
         color: var(--inputtext);
+        border-radius: 6px;
+        padding: 5px;
       }
 
       #input-error {
@@ -222,12 +234,36 @@
       #qrcode {
         width: 100%;
         height: 100%;
-        padding: 5px;
+        padding-left: 5px;
+        padding-right: 5px;
       }
 
       #qrcode canvas {
         margin: auto;
         display: block;
+      }
+
+      .scroll-div {
+        height: 200px;
+        overflow: auto;
+        float: left;
+        border: none;
+      }
+      .scroll::-webkit-scrollbar {
+        nav-right: 2px;
+        width: 10px;
+        height: auto;
+      }
+      .scroll::-webkit-scrollbar-thumb {
+        border-radius: 10px;
+        background: var(--scrollbg);
+      }
+      .scroll::-webkit-scrollbar-track {
+        border-radius: 20px;
+        background: var(--scrollbgo);
+      }
+      .error-text {
+        font-size: 20px;
       }
     </style>
   </head>
@@ -283,19 +319,21 @@
           id=""
           autofocus
           placeholder="在此输入用于生成二维码的内容"
+          class="scroll"
         ></textarea>
       </div>
-      <div id="qrcode">
+      <div id="qrcode" class="scroll-div scroll">
         <div class="error">
-          需要启用 JavaScript 或换用支持的浏览器，例如 Ungoogled Chromium。
+          需要启用 JavaScript 或换用支持的浏览器，例如 Ungoogled Chromium。<br>Need Supported Web browser or enable javascript.
         </div>
       </div>
     </div>
 
     <script type="text/javascript">
+      //darkmode
       var darkMode = "light";
       function changeMode() {
-        console.log("123");
+        console.log("ChangeMode run.");
         darkMode =
           window.document.documentElement.getAttribute("data-theme") || "light";
         console.log(darkMode);
@@ -341,6 +379,9 @@
           const messageElement = document.createTextNode(message);
           input_error.appendChild(messageElement);
           input_error.style.display = "block";
+          setTimeout(() => {
+            input_error.style.display = "none";
+          }, 5000);
         } else {
           input_error.style.display = "none";
         }
@@ -348,7 +389,7 @@
 
       const showQrCodeGenerationError = (message) => {
         // Bad practice, but XSS should not be possible
-        qrcode.innerHTML = `<div class="error"><b>提示：</b><br>${message}</div>`;
+        qrcode.innerHTML = `<div class="error error-text" style="${font_error}"><b>${TipStart}</b><br>${message}</div>`;
       };
 
       const updateQRCode = () => {
@@ -362,9 +403,7 @@
         text = input_area.value;
         const max_length = MAX_TEXT_LENGTH_FOR[ERROR_CORRECTION_LEVEL];
         if (!text) {
-          showQrCodeGenerationError(
-            '您可以通过在此框中输入任何文本来生成二维码。代码本地执行，不会上传任何信息。<br>您可以下载此文件（右上角的按钮）以离线使用。<br>如果布局有问题，请尝试调整浏览器窗口的大小。<br><br>⚠️ 二维码的最大大小为 2950 字节（约 900 汉字或 2900 ASCII 字符）<br>⚠️ 某些功能在某些浏览器中无法使用。根据我的经验，Chromium 浏览器效果最好。<br>🎉 现在应该也适用于表情符号<br>📁 您现在可以将文件拖放到此文本框中<br>📁 您可以将文件复制粘贴到此文本区域<br><br>您也可以尝试某些高级二维码的生成，比如使用类似下一行格式的文本生成连接 Wi-Fi 的二维码：<b class="CourierNew">WIFI:T:WPA;S:我是网络名称;P:我是密码;;</b><br><br>或者让别人快速地给你发一封邮件？试试：\'<b class="CourierNew">mailto:user@example.com</b>\'<br>让别人打电话或发短信给你？用 \'<b class="CourierNew">tel:+8617700000000</b>\' 与 \'<b class="CourierNew">smsto:+8615300000000:经验+3，告辞！</b>\' 就行了！<br><br>或者想骗你的朋友？试试这个：https://go.microsoft.com/fwlink/?LinkId=872991<br><br>本生成器修改自：<a class="linktip" href="https://github.com/six-two/qr.html">https://github.com/six-two/qr.html</a><br>QR生成代码来自：<a class="linktip" href="https://github.com/nimiq/qr-creator">https://github.com/nimiq/qr-creator</a><br>项目地址：<a class="linktip" href="https://github.com/cacheci/qr.html">https://github.com/cacheci/qr.html</a>'
-          );
+          showQrCodeGenerationError(infoweb);
         } else if (text.length > max_length) {
           // If the error correction level is not L, add the suggestion of lowering it to allow more contents
           let level_text = "",
@@ -374,7 +413,7 @@
             suggestion = ` You could also try to decrease the ERROR_CORRECTION_LEVEL setting. At level 'L' the maximum size would be ${MAX_TEXT_LENGTH_FOR["L"]} characters.`;
           }
           showQrCodeGenerationError(
-            `内容长度超限 (${text.length}/${max_length})`
+            `${toomanybit} (${text.length}/${max_length})`
           );
         } else {
           // Delete the error message (in case it existed) or the old QR code
@@ -385,8 +424,8 @@
               window.document.documentElement.getAttribute("data-theme") ||
               "light";
             if (darkMode == "dark") {
-              colorQR_BG = "#bdb4b9";
-              colorQR_Fill = "#32011e";
+              colorQR_BG = "#808a9f";
+              colorQR_Fill = "#1e0132";
             } else {
               colorQR_BG = "#fff5fb";
               colorQR_Fill = "#32011e";
@@ -428,15 +467,14 @@
               console.log(QR_BORDER_SIZE, qr_size - 2 * QR_BORDER_SIZE);
             }
           } catch (error) {
-            showQrCodeGenerationError(
-              '生成失败！如果没有隐私问题的情况下，可以带上你的内容到<a href="https://github.com/cacheci/qr.html/issues">这里</a>反馈问题！'
-            );
+            showQrCodeGenerationError(QrError);
             console.error("Error while generating QR code", error);
           }
         }
       };
 
       const handleFileUpload = (files) => {
+        input_error.style.display = "none";
         if (files.length == 1) {
           files[0]
             .text()
@@ -448,10 +486,10 @@
               updateQRCode();
             })
             .catch((error) => {
-              showInputError(`Error reading the file: ${error}`);
+              showInputError(`${readingerror} ${error}`);
             });
         } else {
-          showInputError(`载入 ${files.length} 个文件。一次只能加载一个`);
+          showInputError(`${Toomanyfile} (${files.length}/1)`);
         }
       };
 
@@ -1361,6 +1399,64 @@
           return C;
         })()
       );
+
+      //i18n
+
+      var weblang = "en";
+      var infoweb = "loading";
+      var font_error;
+      var TipStart;
+      var toomanybit;
+      var QrError;
+      var Toomanyfile;
+      var readingerror;
+
+      const langupdate = (partlang) => {
+        if (partlang == "en") {
+          document.getElementById("input").placeholder = "Type here.";
+          document.getElementsByClassName("error")[0].innerHTML =
+            "Javascript Error.";
+          document.getElementsByClassName("button")[0].innerHTML = "Dark Mode";
+          document.getElementsByClassName("title")[0].innerHTML =
+            "QR Generater";
+          TipStart = "Tip: ";
+          toomanybit = "Too many bytes! ";
+          infoweb =
+            'You can generate QR codes from any text by typing in in this box. The code generation is performed on your local device, no data is sent anywhere.<br>You can even download this file (see button on the top right) and use it when you are not connected to the Internet.<br>If the layout looks strange, try resizing your browser window. It always tries to maximize the QR code\'s size, which can look strange sometimes.<br><br>⚠️ The maximum size of a QR code is 2950 bytes.<br>⚠️ Some features will not work in some browsers. In my experience Chrome works best.<br>🎉 This should now also work with Emoji.<br>📁 You can now drag and drop a file in this text box.<br>📁 And you can copy-paste a file to this text area.<br><br>This page is modded from <a class="linktip" href="https://github.com/six-two/qr.html">https://github.com/six-two/qr.html</a><br>QR generating code from <a class="linktip" href="https://github.com/nimiq/qr-creator">https://github.com/nimiq/qr-creator</a><br>Project address <a class="linktip" href="https://github.com/cacheci/qr.html">https://github.com/cacheci/qr.html</a>';
+          QrError =
+            'Generating failed! You can bring your text <a href="https://github.com/cacheci/qr.html/issues">here</a> to help us debug!';
+          Toomanyfile = "Too many files!";
+          readingerror = "Error reading the file: ";
+          font_error = "font-family: Arial";
+        } else if (partlang == "zh") {
+          weblang = "zh";
+          TipStart = "提示：";
+          toomanybit = "内容长度超限！";
+          QrError =
+            '生成失败！如果没有隐私问题的情况下，可以带上你的内容到<a href="https://github.com/cacheci/qr.html/issues">这里</a>反馈问题！';
+          Toomanyfile = "一次性添加过多文件！";
+          readingerror = "读取错误：";
+          infoweb =
+            '您可以通过在输入框中输入任何文本来生成二维码。<br>代码本地执行，不会上传任何信息。<br>您可以下载此文件（右上角的按钮）以离线使用。<br>如果布局有问题，请尝试调整浏览器窗口的大小。<br><br>⚠️ 二维码的最大大小为 2950 字节（约一段含有 900 汉字的文章）<br>⚠️ 某些浏览器中会出现功能异常。如果遇到问题请使用 Chrome。<br>🎉 现在应该也适用于表情符号<br>📁 您现在可以将文件拖放到此文本框中<br>📁 您可以将文件复制粘贴到此文本区域<br><br>您也可以尝试某些高级二维码的生成，比如：<br>使用类似下一行格式的文本生成连接 Wi-Fi 的二维码：<br><b class="CourierNew">WIFI:T:WPA;S:我是网络名称;P:我是密码;;</b><br>或者让别人快速地给你发一封邮件？试试：<br>\'<b class="CourierNew">mailto:user@example.com</b>\'<br>让别人打电话或发短信给你？<br>\'<b class="CourierNew">tel:+8617700000000</b>\' <br> \'<b class="CourierNew">smsto:+8615300000000:经验+3，告辞！</b>\' <br>或者想骗你的朋友？试试这个：<br>\'<b class="CourierNew">https://go.microsoft.com/fwlink/?LinkId=872991</b>\'<br><br>本生成器修改自：<a class="linktip" href="https://github.com/six-two/qr.html">https://github.com/six-two/qr.html</a><br>QR生成代码来自：<a class="linktip" href="https://github.com/nimiq/qr-creator">https://github.com/nimiq/qr-creator</a><br>项目地址：<a class="linktip" href="https://github.com/cacheci/qr.html">https://github.com/cacheci/qr.html</a>';
+          font_error = 'font-family: "FangSong", Courier, "PingFang SC"';
+        }
+        console.log(`lang changed to ${partlang}`);
+        showQrCodeGenerationError(infoweb);
+      };
+
+      const langgetdefault = () => {
+        weblang = navigator.language || navigator.userLanguage;
+        weblang = weblang.substr(0, 2);
+        console.log(weblang);
+        langupdate(weblang);
+      };
+
+      langgetdefault();
+
+      function setlangatconsole(langc) {
+        langupdate(langc);
+        weblang = langc;
+      }
     </script>
   </body>
 </html>
