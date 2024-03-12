@@ -268,10 +268,10 @@
   </head>
   <body>
     <header id="header">
-      <div class="title">二维码生成器</div>
+      <div class="title"></div>
       <div class="expand"></div>
 
-      <button class="button" onclick="changeMode()">黑暗模式</button>
+      <button class="button" onclick="changeMode()"></button>
       <a id="download" href="" download>
         <svg
           width="28px"
@@ -309,7 +309,7 @@
         </svg>
       </a>
     </header>
-    <div id="text-and-qr">
+    <div id="text-and-qr" style="display: none;">
       <div id="input-div">
         <div id="input-error" class="error"></div>
         <textarea
@@ -327,7 +327,7 @@
         </div>
       </div>
     </div>
-
+    <div id="No-JS">请启用Javascript<br>Enable JavaScript Plz</div>
     <script type="text/javascript">
       //darkmode
       var darkMode = "light";
@@ -1436,6 +1436,12 @@
             '生成失败！如果没有隐私问题的情况下，可以带上你的内容到<a href="https://github.com/cacheci/qr.html/issues">这里</a>反馈问题！';
           Toomanyfile = "一次性添加过多文件！";
           readingerror = "读取错误：";
+          document.getElementsByClassName("button")[0].innerHTML = "黑暗模式"
+          document.getElementById("input").placeholder = "在此输入用于生成二维码的内容";
+          document.getElementsByClassName("error")[0].innerHTML =
+            "Javascript 错误。";
+            document.getElementsByClassName("title")[0].innerHTML =
+            "二维码生成器";
           infoweb =
             '您可以通过在输入框中输入任何文本来生成二维码。<br>代码本地执行，不会上传任何信息。<br>您可以下载此文件（右上角的按钮）以离线使用。<br>如果布局有问题，请尝试调整浏览器窗口的大小。<br><br>⚠️ 二维码的最大大小为 2950 字节（约一段含有 900 汉字的文章）<br>⚠️ 某些浏览器中会出现功能异常。如果遇到问题请使用 Chrome。<br>🎉 现在应该也适用于表情符号<br>📁 您现在可以将文件拖放到此文本框中<br>📁 您可以将文件复制粘贴到此文本区域<br><br>您也可以尝试某些高级二维码的生成，比如：<br>使用类似下一行格式的文本生成连接 Wi-Fi 的二维码：<br><b class="CourierNew">WIFI:T:WPA;S:我是网络名称;P:我是密码;;</b><br>或者让别人快速地给你发一封邮件？试试：<br>\'<b class="CourierNew">mailto:user@example.com</b>\'<br>让别人打电话或发短信给你？<br>\'<b class="CourierNew">tel:+8617700000000</b>\' <br> \'<b class="CourierNew">smsto:+8615300000000:经验+3，告辞！</b>\' <br>或者想骗你的朋友？试试这个：<br>\'<b class="CourierNew">https://go.microsoft.com/fwlink/?LinkId=872991</b>\'<br><br>本生成器修改自：<a class="linktip" href="https://github.com/six-two/qr.html">https://github.com/six-two/qr.html</a><br>QR生成代码来自：<a class="linktip" href="https://github.com/nimiq/qr-creator">https://github.com/nimiq/qr-creator</a><br>项目地址：<a class="linktip" href="https://github.com/cacheci/qr.html">https://github.com/cacheci/qr.html</a>';
           font_error = 'font-family: "FangSong", Courier, "PingFang SC"';
@@ -1449,6 +1455,8 @@
         weblang = navigator.language || navigator.userLanguage;
         weblang = weblang.substr(0, 2);
         console.log(weblang);
+        document.getElementById("text-and-qr").style.display = "flex";
+        document.getElementById("No-JS").style.display = "none";
         langupdate(weblang);
       };
 
