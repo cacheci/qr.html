@@ -9,7 +9,7 @@
       http-equiv="Content-Security-Policy"
       content="default-src 'self' 'unsafe-inline' https://cacheci.com data:;"
     />
-    <title idl="WEBtitle"></title>
+    <title></title>
     <link
       rel="icon"
       type="image/x-icon"
@@ -125,7 +125,6 @@
         padding: 0px;
         display: flex;
         flex-direction: column;
-        overflow: hidden;
         background-color: var(--sitebg);
       }
 
@@ -265,7 +264,7 @@
       }
     </style>
   </head>
-  <body>
+  <body onload="handleWindowResize()">
     <header id="header">
       <div class="title"></div>
       <div class="expand"></div>
@@ -318,13 +317,11 @@
           autofocus
           placeholder="在此输入用于生成二维码的内容"
           class="scroll"
+          oninput="updateQRCode()"
         ></textarea>
       </div>
       <div id="qrcode" class="scroll-div scroll">
-        <div class="error">
-          需要启用 JavaScript 或换用支持的浏览器，例如 Ungoogled Chromium。<br />Need
-          Supported Web browser or enable javascript.
-        </div>
+        <div class="error"></div>
       </div>
     </div>
     <div id="No-JS">请启用Javascript<br />Enable JavaScript Plz</div>
@@ -391,12 +388,16 @@
         qrcode.innerHTML = `<div class="error error-text" style="${font_error}"><b>${TipStart}</b><br>${message}</div>`;
       };
 
+      var isbrowsersafari = 1.0;
+
       const updateQRCode = () => {
         const max_size_fit_window = Math.min(
-          qrcode.clientWidth,
-          qrcode.clientHeight,
+          isbrowsersafari * qrcode.clientWidth,
+          isbrowsersafari * qrcode.clientHeight,
           QR_MAX_SIZE
         );
+
+        //document.getElementsByClassName("title")[0].innerHTML = isbrowsersafari;
         const qr_size = Math.max(QR_MIN_SIZE, max_size_fit_window) - 10; // remove 2 * 5px for the paddings
 
         text = input_area.value;
@@ -511,53 +512,6 @@
         handleFileUpload(e.dataTransfer.files);
         return false;
       });
-
-      // Update the QR code whenever the text or the window size changes
-      // Use max-width/height to keep the QR code div in square shape and allow the textarea to use the remaining space
-      input_area.addEventListener("input", updateQRCode);
-      const on_window_resize = () => {
-        const width = text_and_qr.clientWidth;
-        const height = text_and_qr.clientHeight;
-        if (!width || !height) {
-          console.warn(
-            `Size can not be 0 or undefined. But size is (${width}, ${height})`
-          );
-        }
-
-        const toStyleValue = (size_in_pixels) => {
-          return `${Math.max(size_in_pixels - PADDING, 0)}px`;
-        };
-        if (width < height) {
-          const remaining_height =
-            document.body.clientHeight - header.clientHeight - 100; // 100 is the minimum height of the input area div
-          // portrait view -> vertical
-          text_and_qr.style.flexDirection = "column";
-          qrcode.style.maxWidth = "";
-          qrcode.style.maxHeight = toStyleValue(
-            Math.min(width, remaining_height)
-          );
-        } else {
-          // landscape view -> horizontal
-          const remaining_width = document.body.clientWidth - 200; // 200 is the minimum width of the input area div
-          text_and_qr.style.flexDirection = "row";
-          qrcode.style.maxWidth = toStyleValue(
-            Math.min(height, remaining_width)
-          );
-          // Workaround for QR code not shrinking
-          qrcode.style.maxHeight = toStyleValue(
-            document.body.clientHeight - header.clientHeight
-          );
-        }
-
-        updateQRCode();
-      };
-
-      window.addEventListener("resize", on_window_resize);
-
-      // sometimes the event does not get called (for example when closing the browser console). So we call it regularly just to be sure
-      setInterval(on_window_resize, 1000);
-      // Call it shortly after loading the page to determine the inital layout
-      setTimeout(on_window_resize, 10);
 
       // ======= https://github.com/nimiq/qr-creator, MIT License, Copyright (c) 2017 The Nimiq Foundation =======
       // Minified version from https://cdn.jsdelivr.net/npm/qr-creator/dist/qr-creator.min.js
@@ -1439,7 +1393,7 @@
           readingerror = "读取错误：";
           document.getElementsByClassName("button")[0].innerHTML = "黑暗模式";
           document.getElementById("input").placeholder =
-            "在此输入用于生成二维码的内容";
+            "在此输入生成二维码的内容";
           document.getElementsByClassName("error")[0].innerHTML =
             "Javascript 错误。";
           document.getElementsByClassName("title")[0].innerHTML =
@@ -1454,16 +1408,32 @@
         showQrCodeGenerationError(infoweb);
       };
 
-      const langgetdefault = () => {
+      const setarstart = () => {
         weblang = navigator.language || navigator.userLanguage;
         weblang = weblang.substr(0, 2);
         console.log(weblang);
         document.getElementById("text-and-qr").style.display = "flex";
         document.getElementById("No-JS").style.display = "none";
         langupdate(weblang);
+        document.body.style.overflow = "hidden";
+        //infoweb = navigator.vendor;
+        if (navigator.vendor.search(/Apple/i) == 0) {
+          document.body.style.overflow = "";
+          document.body.style.overflowX = "hidden";
+          document.body.style.overflowY = "auto";
+          document.getElementsByClassName("scroll-div").overflowY = "hidden";
+          document.getElementById("qrcode").style.paddingRight = "0px";
+          isbrowsersafari = 0.8;
+          //document.getElementById("qrcode").style.height = "50%";
+          //document.getElementsByClassName("title")[0].innerHTML = "Safari";
+          console.log("Safari Mode.");
+          //window.addEventListener("orientationchange", handleWindowResize);
+        } else {
+          window.addEventListener("resize", handleWindowResize);
+        }
       };
 
-      langgetdefault();
+      setarstart();
 
       function setlangatconsole(langc) {
         langupdate(langc);
@@ -1472,29 +1442,62 @@
 
       var screenmode = 2;
       var toosmall = 0;
+      let qrcodearea = document.getElementById("qrcode");
 
+      //width <
       function handleWindowResize() {
+        const width = text_and_qr.clientWidth;
+        const height = text_and_qr.clientHeight;
+        if (!width || !height) {
+          console.warn(
+            `Size can not be 0 or undefined. But size is (${width}, ${height})`
+          );
+        }
+        const toStyleValue = (size_in_pixels) => {
+          return `${Math.max(size_in_pixels - PADDING, 0)}px`;
+        };
         if (document.body.clientWidth / document.body.clientHeight >= 0.94) {
           if (screenmode != 0) {
             console.log("Big Screen Mode");
+            qrcodearea.style.paddingLeft = "5px";
+            qrcodearea.style.paddingRight = "5px";
+            qrcodearea.style.paddingTop = "0px";
+            qrcodearea.style.paddingBottom = "0px";
+            qrcodearea.style.marginTop = "0px";
             screenmode = 0;
           }
+          // landscape view -> horizontal
+          const remaining_width = document.body.clientWidth - 200; // 200 is the minimum width of the input area div
+          text_and_qr.style.flexDirection = "row";
 
-          document.getElementById("qrcode").style.paddingLeft = "5px";
-          document.getElementById("qrcode").style.paddingRight = "5px";
-          document.getElementById("qrcode").style.paddingTop = "0px";
-          document.getElementById("qrcode").style.paddingBottom = "0px";
+          qrcode.style.maxWidth = toStyleValue(
+            Math.min(height, remaining_width)
+          );
+          // Workaround for QR code not shrinking
+          qrcode.style.maxHeight = toStyleValue(
+            document.body.clientHeight - header.clientHeight
+          );
         } else {
           if (screenmode != 1) {
             console.log("Mobile Mode.");
+            qrcodearea.style.paddingLeft = "0px";
+            qrcodearea.style.paddingRight = "2px";
+            qrcodearea.style.paddingTop = "0px";
+            qrcodearea.style.paddingBottom = "10px";
+            qrcodearea.style.marginTop = "5px";
             screenmode = 1;
+            if (isbrowsersafari == 0.8) {
+              document.scrollbar[0].style.display = "none";
+            }
           }
-          document.getElementById("qrcode").style.paddingLeft = "0px";
-          document.getElementById("qrcode").style.paddingRight = "2px";
-          document.getElementById("qrcode").style.paddingTop = "0px";
-          document.getElementById("qrcode").style.paddingBottom = "10px";
-          document.getElementById("qrcode").style.marginTop = "5px";
-          document.getElementById("input").style.paddingRight = "15px";
+          const remaining_height =
+            document.body.clientHeight - header.clientHeight - 100; // 100 is the minimum height of the input area div
+          // portrait view -> vertical
+          text_and_qr.style.flexDirection = "column";
+          qrcode.style.maxWidth = "";
+          qrcode.style.maxHeight = toStyleValue(
+            Math.min(width, remaining_height)
+          );
         }
         if (document.body.clientWidth <= 320) {
           document.getElementsByClassName("button")[0].style.display = "none";
@@ -1506,11 +1509,12 @@
           document.getElementsByClassName("button")[0].style.display =
             "inline-block";
         }
+        updateQRCode();
       }
 
       handleWindowResize();
 
-      window.addEventListener("resize", handleWindowResize);
+      //window.addEventListener("resize", handleWindowResize);
     </script>
   </body>
 </html>
