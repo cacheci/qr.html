@@ -7,13 +7,13 @@
     <!-- Make sure that no communication with external sites is possible -->
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self' 'unsafe-inline' https://cacheci.com data:;"
+      content="default-src 'self' 'unsafe-inline' https://qr.cacheci.com file:/// data:;"
     />
     <title></title>
     <link
       rel="icon"
       type="image/x-icon"
-      href="https://cacheci.com/favicon.ico"
+      href="https://qr.cacheci.com/favicon.ico"
     />
     <script>
       const get_or_default_int = (name, default_value) => {
@@ -141,8 +141,8 @@
         white-space: nowrap;
       }
 
-      header a,
-      header .button {
+      header #download,
+      header #button {
         color: var(--headertext);
         margin-right: 20px;
         text-decoration: none;
@@ -153,7 +153,7 @@
         fill: var(--headertext);
       }
 
-      header .button {
+      header #button {
         cursor: pointer;
         height: 26px;
         text-decoration: none;
@@ -161,6 +161,13 @@
         border-style: solid;
         border-color: var(--button);
         color: var(--headertext);
+      }
+
+      header #download {
+        border: none;
+        color: none;
+        background: none;
+        margin-top: -1px;
       }
 
       .expand {
@@ -175,7 +182,12 @@
       }
 
       .CourierNew {
-        font-family: "Courier New", monospace, "PingFang SC", "SimHei";
+        font-family: "Courier New", monospace, -apple-system, system-ui;
+        word-break: break-all;
+      }
+
+      .linktip {
+        word-break: break-all;
       }
 
       #input-div {
@@ -269,8 +281,8 @@
       <div class="title"></div>
       <div class="expand"></div>
 
-      <button class="button" onclick="changeMode()"></button>
-      <a id="download" href="" download>
+      <button class="button" id="button" onclick="changeMode()"></button>
+      <button id="download" onclick="download()">
         <svg
           width="28px"
           viewBox="0 0 24 24"
@@ -284,7 +296,7 @@
             />
           </g>
         </svg>
-      </a>
+      </button>
       <a
         href="https://github.com/cacheci/qr.html"
         target="_blank"
@@ -390,6 +402,8 @@
 
       var isbrowsersafari = 1.0;
 
+      max_length = MAX_TEXT_LENGTH_FOR[ERROR_CORRECTION_LEVEL];
+
       const updateQRCode = () => {
         const max_size_fit_window = Math.min(
           isbrowsersafari * qrcode.clientWidth,
@@ -401,17 +415,10 @@
         const qr_size = Math.max(QR_MIN_SIZE, max_size_fit_window) - 10; // remove 2 * 5px for the paddings
 
         text = input_area.value;
-        const max_length = MAX_TEXT_LENGTH_FOR[ERROR_CORRECTION_LEVEL];
+        max_length = MAX_TEXT_LENGTH_FOR[ERROR_CORRECTION_LEVEL];
         if (!text) {
           showQrCodeGenerationError(infoweb);
         } else if (text.length > max_length) {
-          // If the error correction level is not L, add the suggestion of lowering it to allow more contents
-          let level_text = "",
-            suggestion = "";
-          if (ERROR_CORRECTION_LEVEL != "L") {
-            level_text = ` with error correction level '${ERROR_CORRECTION_LEVEL}'`;
-            suggestion = ` You could also try to decrease the ERROR_CORRECTION_LEVEL setting. At level 'L' the maximum size would be ${MAX_TEXT_LENGTH_FOR["L"]} characters.`;
-          }
           showQrCodeGenerationError(
             `${toomanybit} (${text.length}/${max_length})`
           );
@@ -1380,7 +1387,7 @@
             'Generating failed! You can bring your text <a href="https://github.com/cacheci/qr.html/issues">here</a> to help us debug!';
           Toomanyfile = "Too many files!";
           readingerror = "Error reading the file: ";
-          font_error = "font-family: Arial";
+          font_error = "font-family: Arial, system-ui";
           document.title = "QR Generator";
           toosmalldisplay = "Screen too small!";
         } else if (partlang == "zh") {
@@ -1400,7 +1407,8 @@
             "二维码生成器";
           infoweb =
             '您可以通过在输入框中输入任何文本来生成二维码。<br>代码本地执行，不会上传任何信息。<br>您可以下载此文件（右上角的按钮）以离线使用。<br>如果布局有问题，请尝试调整浏览器窗口的大小。<br><br>⚠️ 二维码的最大大小为 2950 字节（约一段含有 900 汉字的文章）<br>⚠️ 某些浏览器中会出现功能异常。如果遇到问题请使用 Chrome。<br>🎉 现在应该也适用于表情符号<br>📁 您现在可以将文件拖放到此文本框中<br>📁 您可以将文件复制粘贴到此文本区域<br><br>您也可以尝试某些高级二维码的生成，比如：<br>使用类似下一行格式的文本生成连接 Wi-Fi 的二维码：<br><b class="CourierNew">WIFI:T:WPA;S:我是网络名称;P:我是密码;;</b><br>或者让别人快速地给你发一封邮件？试试：<br>\'<b class="CourierNew">mailto:user@example.com</b>\'<br>让别人打电话或发短信给你？<br>\'<b class="CourierNew">tel:+8617700000000</b>\' <br> \'<b class="CourierNew">smsto:+8615300000000:经验+3，告辞！</b>\' <br>或者想骗你的朋友？试试这个：<br>\'<b class="CourierNew">https://go.microsoft.com/fwlink/?LinkId=872991</b>\'<br><br>本生成器修改自：<a class="linktip" href="https://github.com/six-two/qr.html">https://github.com/six-two/qr.html</a><br>QR生成代码来自：<a class="linktip" href="https://github.com/nimiq/qr-creator">https://github.com/nimiq/qr-creator</a><br>项目地址：<a class="linktip" href="https://github.com/cacheci/qr.html">https://github.com/cacheci/qr.html</a>';
-          font_error = 'font-family: "FangSong", Courier, "PingFang SC"';
+          font_error =
+            'font-family: "FangSong", Courier, "PingFang SC", "Noto Sans SC", system-ui';
           document.title = "二维码生成器";
           toosmalldisplay = "窗口过小！";
         } else langupdate("en");
@@ -1443,6 +1451,21 @@
       var screenmode = 2;
       var toosmall = 0;
       let qrcodearea = document.getElementById("qrcode");
+
+      //download page
+
+      function download() {
+        //todo
+        fetch("https://qr.cacheci.com/index.html")
+          .then((response) => response.blob())
+          .then((blob) => {
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "qr.html";
+            link.target = "_blank"; // 可选，如果希望在新窗口中下载文件，请取消注释此行
+            link.click();
+          });
+      }
 
       //width <
       function handleWindowResize() {
