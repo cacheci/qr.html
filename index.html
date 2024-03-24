@@ -423,7 +423,7 @@
       };
 
       var isbrowsersafari = 1.0;
-      var moz_mode = false;
+      var no_clip_mode = false;
 
       max_length = MAX_TEXT_LENGTH_FOR[ERROR_CORRECTION_LEVEL];
 
@@ -1462,12 +1462,16 @@
           console.log("Safari Mode.");
         } else {
           if (CSS.supports("-moz-box-sizing", "content-box")) {
-            moz_mode = true;
+            no_clip_mode = true;
             console.log("moz");
             document.getElementsByClassName("btn-copy")[0].style.display =
               "none";
           }
           window.addEventListener("resize", handleWindowResize);
+        }
+        if (!navigator.clipboard) {
+          console.log("clipboard not supported.");
+          no_clip_mode = true;
         }
       };
 
@@ -1560,7 +1564,7 @@
               window.alert(toosmalldisplay);
               toosmall = 1;
             }
-          } else if ((moz_mode = false)) {
+          } else if ((no_clip_mode = false)) {
             document.getElementsByClassName("btn-copy")[0].style.display =
               "inline-block";
           }
@@ -1578,23 +1582,7 @@
       var textcopied = "Error: Clipboard";
       var firstcopy = true;
 
-      async function clipboard_paste() {
-        (async () => {
-          textcopied = await navigator.clipboard.readText();
-        })();
-        try {
-          const textcopied = await navigator.clipboard.readText();
-          return textcopied;
-        } catch (err) {
-          console.error("Error reading Clipboard: ", err);
-          return null;
-        }
-      }
-
       function pastenext() {
-        if (!navigator.clipboard) {
-          console.log("clipboard not supported.");
-        }
         navigator.clipboard.readText().then((clipText) => {
           document.getElementById("input").value = clipText;
           updateQRCode();
