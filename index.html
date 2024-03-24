@@ -1472,6 +1472,7 @@
         if (!navigator.clipboard) {
           console.log("clipboard not supported.");
           no_clip_mode = true;
+          document.getElementsByClassName("btn-copy")[0].style.display = "none";
         }
       };
 
