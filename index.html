@@ -195,8 +195,9 @@
       }
 
       .CourierNew {
-        font-family: "Courier New", monospace, -apple-system, system-ui;
+        font-family: "Courier New", -apple-system, STXihei, system-ui;
         word-break: break-all;
+        font-size: 15px;
       }
 
       .linktip {
@@ -422,6 +423,7 @@
       };
 
       var isbrowsersafari = 1.0;
+      var moz_mode = false;
 
       max_length = MAX_TEXT_LENGTH_FOR[ERROR_CORRECTION_LEVEL];
 
@@ -451,7 +453,7 @@
               window.document.documentElement.getAttribute("data-theme") ||
               "light";
             if (darkMode == "dark") {
-              colorQR_BG = "#808a9f";
+              colorQR_BG = "#9ea8bd";
               colorQR_Fill = "#1e0132";
             } else {
               colorQR_BG = "#fff5fb";
@@ -1431,9 +1433,9 @@
             "二维码生成器";
           infoweb =
             '您可以通过在输入框中输入任何文本来生成二维码。<br>代码本地执行，不会上传任何信息。<br>您可以下载此文件（右上角的按钮）以离线使用。<br>如果布局有问题，请尝试调整浏览器窗口的大小。<br><br>⚠️ 二维码的最大大小为 2950 字节（约一段含有 900 汉字的文章）<br>⚠️ 某些浏览器中会出现功能异常。如果遇到问题请使用 Chrome。<br>🎉 现在应该也适用于表情符号<br>📁 您现在可以将文件拖放到此文本框中<br>📁 您可以将文件复制粘贴到此文本区域<br><br>您也可以尝试某些高级二维码的生成，比如：<br>使用类似下一行格式的文本生成连接 Wi-Fi 的二维码：<br><b class="CourierNew">WIFI:T:WPA;S:我是网络名称;P:我是密码;;</b><br>或者让别人快速地给你发一封邮件？试试：<br>\'<b class="CourierNew">mailto:user@example.com</b>\'<br>让别人打电话或发短信给你？<br>\'<b class="CourierNew">tel:+8617700000000</b>\' <br> \'<b class="CourierNew">smsto:+8615300000000:经验+3，告辞！</b>\' <br>或者想骗你的朋友？试试这个：<br>\'<b class="CourierNew">https://go.microsoft.com/fwlink/?LinkId=872991</b>\'<br>向身份验证器应用添加TOTP项目？<b class="CourierNew">otpauth://totp/Issuer Name:奥利奥利安?secret=AHHHHHHHHH114514&issuer=说的道理网</b><br><br>本生成器修改自：<a class="linktip" href="https://github.com/six-two/qr.html">https://github.com/six-two/qr.html</a><br>QR生成代码来自：<a class="linktip" href="https://github.com/nimiq/qr-creator">https://github.com/nimiq/qr-creator</a><br>项目地址：<a class="linktip" href="https://github.com/cacheci/qr.html">https://github.com/cacheci/qr.html</a>';
-            // may add click to copy function in future.
+          // may add click to copy function in future.
           font_error =
-            'font-family: "FangSong", Courier, "PingFang SC", "Noto Sans SC", system-ui';
+            'font-family: "FangSong", Courier, "PingFang SC", "Noto Sans SC", STXihei, system-ui';
           document.title = "二维码生成器";
           toosmalldisplay = "窗口过小！";
         } else langupdate("en");
@@ -1459,6 +1461,12 @@
           isbrowsersafari = 0.8;
           console.log("Safari Mode.");
         } else {
+          if (CSS.supports("-moz-box-sizing", "content-box")) {
+            moz_mode = true;
+            console.log("moz");
+            document.getElementsByClassName("btn-copy")[0].style.display =
+              "none";
+          }
           window.addEventListener("resize", handleWindowResize);
         }
       };
@@ -1472,7 +1480,6 @@
 
       var screenmode = 2;
       var toosmall = 0;
-      let qrcodearea = document.getElementById("qrcode");
 
       //download page
 
@@ -1504,11 +1511,11 @@
         if (document.body.clientWidth / document.body.clientHeight >= 0.94) {
           if (screenmode != 0) {
             console.log("Big Screen Mode");
-            qrcodearea.style.paddingLeft = "5px";
-            qrcodearea.style.paddingRight = "5px";
-            qrcodearea.style.paddingTop = "0px";
-            qrcodearea.style.paddingBottom = "0px";
-            qrcodearea.style.marginTop = "0px";
+            document.getElementById("qrcode").style.paddingLeft = "5px";
+            document.getElementById("qrcode").style.paddingRight = "5px";
+            document.getElementById("qrcode").style.paddingTop = "0px";
+            document.getElementById("qrcode").style.paddingBottom = "0px";
+            document.getElementById("qrcode").style.marginTop = "0px";
             screenmode = 0;
           }
           // landscape view -> horizontal
@@ -1525,11 +1532,11 @@
         } else {
           if (screenmode != 1) {
             console.log("Mobile Mode.");
-            qrcodearea.style.paddingLeft = "0px";
-            qrcodearea.style.paddingRight = "2px";
-            qrcodearea.style.paddingTop = "0px";
-            qrcodearea.style.paddingBottom = "10px";
-            qrcodearea.style.marginTop = "5px";
+            document.getElementById("qrcode").style.paddingLeft = "0px";
+            document.getElementById("qrcode").style.paddingRight = "2px";
+            document.getElementById("qrcode").style.paddingTop = "0px";
+            document.getElementById("qrcode").style.paddingBottom = "10px";
+            document.getElementById("qrcode").style.marginTop = "5px";
             screenmode = 1;
             if (isbrowsersafari == 0.8) {
               document.scrollbar[0].style.display = "none";
@@ -1553,7 +1560,7 @@
               window.alert(toosmalldisplay);
               toosmall = 1;
             }
-          } else {
+          } else if ((moz_mode = false)) {
             document.getElementsByClassName("btn-copy")[0].style.display =
               "inline-block";
           }
@@ -1568,10 +1575,30 @@
 
       //Clipboard
 
+      var textcopied = "Error: Clipboard";
+      var firstcopy = true;
+
+      async function clipboard_paste() {
+        (async () => {
+          textcopied = await navigator.clipboard.readText();
+        })();
+        try {
+          const textcopied = await navigator.clipboard.readText();
+          return textcopied;
+        } catch (err) {
+          console.error("Error reading Clipboard: ", err);
+          return null;
+        }
+      }
+
       function pastenext() {
-        var text = navigator.clipboard.readText();
-        console.log("Paste from clipboard: " + text);
-        document.getElementById("input").innerHTML = text;
+        if (!navigator.clipboard) {
+          console.log("clipboard not supported.");
+        }
+        navigator.clipboard.readText().then((clipText) => {
+          document.getElementById("input").value = clipText;
+          updateQRCode();
+        });
         updateQRCode();
       }
     </script>
