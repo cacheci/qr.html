@@ -141,8 +141,7 @@
         white-space: nowrap;
       }
 
-      header #download,
-      header #button {
+      header #download {
         color: var(--headertext);
         margin-right: 20px;
         text-decoration: none;
@@ -153,7 +152,7 @@
         fill: var(--headertext);
       }
 
-      header #button {
+      header .btn-dark {
         cursor: pointer;
         height: 26px;
         text-decoration: none;
@@ -161,6 +160,20 @@
         border-style: solid;
         border-color: var(--button);
         color: var(--headertext);
+        margin-right: 20px;
+        align-items: center;
+      }
+
+      header .btn-copy {
+        cursor: pointer;
+        height: 26px;
+        text-decoration: none;
+        background-color: rgba(0, 0, 0, 0);
+        border-style: solid;
+        border-color: var(--button);
+        color: var(--headertext);
+        margin-right: 10px;
+        align-items: center;
       }
 
       header #download {
@@ -281,7 +294,16 @@
       <div class="title"></div>
       <div class="expand"></div>
 
-      <button class="button" id="button" onclick="changeMode()"></button>
+      <button
+        class="button btn-copy"
+        id="button"
+        onclick="pastenext()"
+      ></button>
+      <button
+        class="button btn-dark"
+        id="button"
+        onclick="changeMode()"
+      ></button>
       <button id="download" onclick="download()">
         <svg
           width="28px"
@@ -410,7 +432,6 @@
           QR_MAX_SIZE
         );
 
-        //document.getElementsByClassName("title")[0].innerHTML = isbrowsersafari;
         const qr_size = Math.max(QR_MIN_SIZE, max_size_fit_window) - 10; // remove 2 * 5px for the paddings
 
         text = input_area.value;
@@ -1359,7 +1380,7 @@
         })()
       );
 
-      //i18n
+      // ===== i18n =====
 
       var weblang = "en";
       var infoweb = "loading";
@@ -1375,13 +1396,16 @@
           document.getElementById("input").placeholder = "Type here.";
           document.getElementsByClassName("error")[0].innerHTML =
             "Javascript Error.";
-          document.getElementsByClassName("button")[0].innerHTML = "Dark Mode";
+          document.getElementsByClassName("btn-dark")[0].innerHTML =
+            "Dark Mode";
+          document.getElementsByClassName("btn-copy")[0].innerHTML =
+            "Clipboard";
           document.getElementsByClassName("title")[0].innerHTML =
             "QR Generater";
           TipStart = "Tip: ";
           toomanybit = "Too many bytes! ";
           infoweb =
-            'You can generate QR codes from any text by typing in in this box. The code generation is performed on your local device, no data is sent anywhere.<br>You can even download this file (see button on the top right) and use it when you are not connected to the Internet.<br>If the layout looks strange, try resizing your browser window. It always tries to maximize the QR code\'s size, which can look strange sometimes.<br><br>⚠️ The maximum size of a QR code is 2950 bytes.<br>⚠️ Some features will not work in some browsers. In my experience Chrome works best.<br>🎉 This should now also work with Emoji.<br>📁 You can now drag and drop a file in this text box.<br>📁 And you can copy-paste a file to this text area.<br><br>This page is modded from <a class="linktip" href="https://github.com/six-two/qr.html">https://github.com/six-two/qr.html</a><br>QR generating code from <a class="linktip" href="https://github.com/nimiq/qr-creator">https://github.com/nimiq/qr-creator</a><br>Project address <a class="linktip" href="https://github.com/cacheci/qr.html">https://github.com/cacheci/qr.html</a>';
+            'You can generate QR codes from any text by typing in in this box. The code generation is performed on your local device, no data is sent anywhere.<br>You can even download this file (see button on the top right) and use it when you are not connected to the Internet.<br>If the layout looks strange, try resizing your browser window. It always tries to maximize the QR code\'s size, which can look strange sometimes.<br><br>⚠️ The maximum size of a QR code is 2953 bytes (one character is normally one byte, although foreign language characters and emojis take up multiple bytes)<br>⚠️ Some features will not work in some browsers. In my experience Google Chrome works best.<br>🎉 This should now also work with Emojis<br>📁 You can now drag and drop a file in this text box<br>📁 And you can copy-paste a file to this text area<br><br>Here are some examples of what you can do with QR codes:<br>- Link to a website: <b class="CourierNew">https://your-website.com/some/page?with=parameters</b><br>- Share email address: mailto:your.name@gmail.com<br>- Share phone number: <b class="CourierNew">tel:+49123456789</b><br>- Share WLAN network password: <b class="CourierNew">WIFI:T:WPA;S:Your WLAN name;P:Your WLAN password;;</b><br>- Send SMS: <b class="CourierNew">smsto:+49123456789:Hi John, how are you?</b> <br>- Send email: <b class="CourierNew">mailto:recipient@example.com?subject=Test email&body=This is a test email</b><br>- Add second factor to Google Authenticator: <b class="CourierNew">otpauth://totp/Issuer Name:alice@google.com?secret=JBSWY3DPEHPK3PXP&issuer=Issuer Name</b><br><br>This page is modded from <a class="linktip" href="https://github.com/six-two/qr.html">https://github.com/six-two/qr.html</a><br>QR generating code from <a class="linktip" href="https://github.com/nimiq/qr-creator">https://github.com/nimiq/qr-creator</a><br>Project address <a class="linktip" href="https://github.com/cacheci/qr.html">https://github.com/cacheci/qr.html</a>';
           QrError =
             'Generating failed! You can bring your text <a href="https://github.com/cacheci/qr.html/issues">here</a> to help us debug!';
           Toomanyfile = "Too many files!";
@@ -1397,7 +1421,8 @@
             '生成失败！如果没有隐私问题的情况下，可以带上你的内容到<a href="https://github.com/cacheci/qr.html/issues">这里</a>反馈问题！';
           Toomanyfile = "一次性添加过多文件！";
           readingerror = "读取错误：";
-          document.getElementsByClassName("button")[0].innerHTML = "黑暗模式";
+          document.getElementsByClassName("btn-dark")[0].innerHTML = "黑暗模式";
+          document.getElementsByClassName("btn-copy")[0].innerHTML = "剪贴板";
           document.getElementById("input").placeholder =
             "在此输入生成二维码的内容";
           document.getElementsByClassName("error")[0].innerHTML =
@@ -1431,10 +1456,7 @@
           document.getElementsByClassName("scroll-div").overflowY = "hidden";
           document.getElementById("qrcode").style.paddingRight = "0px";
           isbrowsersafari = 0.8;
-          //document.getElementById("qrcode").style.height = "50%";
-          //document.getElementsByClassName("title")[0].innerHTML = "Safari";
           console.log("Safari Mode.");
-          //window.addEventListener("orientationchange", handleWindowResize);
         } else {
           window.addEventListener("resize", handleWindowResize);
         }
@@ -1521,14 +1543,21 @@
             Math.min(width, remaining_height)
           );
         }
-        if (document.body.clientWidth <= 320) {
-          document.getElementsByClassName("button")[0].style.display = "none";
-          if (document.body.clientWidth <= 220 && toosmall != 1) {
-            window.alert(toosmalldisplay);
-            toosmall = 1;
+        if (document.body.clientWidth <= 390) {
+          document.getElementsByClassName("btn-dark")[0].style.display = "none";
+          if (document.body.clientWidth <= 320) {
+            document.getElementsByClassName("btn-copy")[0].style.display =
+              "none";
+            if (document.body.clientWidth <= 220 && toosmall != 1) {
+              window.alert(toosmalldisplay);
+              toosmall = 1;
+            }
+          } else {
+            document.getElementsByClassName("btn-copy")[0].style.display =
+              "inline-block";
           }
         } else {
-          document.getElementsByClassName("button")[0].style.display =
+          document.getElementsByClassName("btn-dark")[0].style.display =
             "inline-block";
         }
         updateQRCode();
@@ -1536,7 +1565,14 @@
 
       handleWindowResize();
 
-      //window.addEventListener("resize", handleWindowResize);
+      //Clipboard
+
+      function pastenext() {
+        var text = navigator.clipboard.readText();
+        console.log("Paste from clipboard: " + text);
+        document.getElementById("input").innerHTML = text;
+        updateQRCode();
+      }
     </script>
   </body>
 </html>
