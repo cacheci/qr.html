@@ -1489,12 +1489,16 @@
         switch (ERROR_CORRECTION_LEVEL) {
           case "L":
             ERROR_CORRECTION_LEVEL = "M";
+            break;
           case "M":
             ERROR_CORRECTION_LEVEL = "Q";
+            break;
           case "Q":
             ERROR_CORRECTION_LEVEL = "H";
+            break;
           case "H":
             ERROR_CORRECTION_LEVEL = "L";
+            break;
         }
         window.alert(string_change_ec + ERROR_CORRECTION_LEVEL);
       }
