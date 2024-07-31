@@ -305,10 +305,7 @@
         id="button"
         onclick="changeMode()"
       ></button>
-      <button
-        class="button btn-ecl"
-        id="button"
-        onclick="ecChange()"
+      <button class="button btn-ecl" id="button" onclick="ecChange()"></button>
       <button id="download" onclick="download()">
         <svg
           width="28px"
@@ -1421,7 +1418,7 @@
           font_error = "font-family: Arial, system-ui";
           document.title = "QR Generator";
           toosmalldisplay = "Screen too small!";
-          string_change_ec = "Error Correction level changed to: "
+          string_change_ec = "Error Correction level changed to: ";
         } else if (partlang == "zh") {
           weblang = "zh";
           TipStart = "提示：";
@@ -1469,14 +1466,6 @@
           document.getElementById("qrcode").style.paddingRight = "0px";
           isbrowsersafari = 0.8;
           console.log("Safari Mode.");
-        } else {
-          if (CSS.supports("-moz-box-sizing", "content-box")) {
-            no_clip_mode = true;
-            console.log("moz");
-            document.getElementsByClassName("btn-copy")[0].style.display =
-              "none";
-          }
-          window.addEventListener("resize", handleWindowResize);
         }
         if (!navigator.clipboard) {
           console.log("clipboard not supported.");
@@ -1498,15 +1487,15 @@
       function ecChange() {
         switch (ERROR_CORRECTION_LEVEL) {
           case "L":
-            ERROR_CORRECTION_LEVEL = "M"
+            ERROR_CORRECTION_LEVEL = "M";
           case "M":
-            ERROR_CORRECTION_LEVEL = "Q"
+            ERROR_CORRECTION_LEVEL = "Q";
           case "Q":
-            ERROR_CORRECTION_LEVEL = "H"
+            ERROR_CORRECTION_LEVEL = "H";
           case "H":
-            ERROR_CORRECTION_LEVEL = "L"
+            ERROR_CORRECTION_LEVEL = "L";
         }
-        window.alert(string_change_ec + ERROR_CORRECTION_LEVEL)
+        window.alert(string_change_ec + ERROR_CORRECTION_LEVEL);
       }
 
       //download page
@@ -1588,7 +1577,7 @@
               window.alert(toosmalldisplay);
               toosmall = 1;
             }
-          } else if ((no_clip_mode == false)) {
+          } else if (no_clip_mode == false) {
             document.getElementsByClassName("btn-copy")[0].style.display =
               "inline-block";
           }
