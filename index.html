@@ -36,7 +36,7 @@
       // ERROR_CORRECTION_LEVEL M – up to 15% damage - MAX_TEXT_LENGTH: 2331
       // ERROR_CORRECTION_LEVEL Q – up to 25% damage - MAX_TEXT_LENGTH: 1663
       // ERROR_CORRECTION_LEVEL H – up to 30% damage - MAX_TEXT_LENGTH: 1273
-      let ERROR_CORRECTION_LEVEL =
+      var ERROR_CORRECTION_LEVEL =
         localStorage.getItem("ERROR_CORRECTION_LEVEL") || "L";
 
       // Size of the QR code in pixels. Set it to 0 to automatically fit the free space
@@ -164,7 +164,8 @@
         align-items: center;
       }
 
-      header .btn-copy {
+      header .btn-copy,
+      header .btn-ecl {
         cursor: pointer;
         height: 26px;
         text-decoration: none;
